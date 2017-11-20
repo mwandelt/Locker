@@ -29,15 +29,16 @@ $locker->release_lock('myProcess');
 
 ## Avoiding Infinite Locks
 
-When there is a power failure or scripts which created a lock get killed or
-crash, their locks would remain forever, blocking any subsequent attempts to get
-exclusive access to the locked resources. In order to avoid this scenario,
-Locker has an automatic unlock feature. By default, the auto unlock period is
-set to 24 hours which means that, when trying to lock a resource, an existing
-lock is ignored if it is older than 24 hours.
+Even if you forget to call the `release_lock` method, all locks created by the
+current script will be removed automatically on shutdown. But when there is a
+power failure, or the script gets killed or crashes, the locks would remain
+forever, blocking any subsequent attempts to get exclusive access to the locked
+resources. In order to avoid this scenario, Locker has an automatic unlock
+feature. 
 
-You can adjust the auto unlock period by providing a second parameter to the
-`get_lock` method:
+By default, when trying to lock a resource, an existing lock is ignored if it is
+older than 24 hours. You can adjust this "auto unlock period" by providing a
+second parameter when calling the `get_lock` method:
 
 ```php
 if ( ! $locker->get_lock( 'myProcess', 180 ) )
@@ -54,7 +55,7 @@ $locker->autoUnlockPeriod = 180;
 ```
 
 You should carefully consider which auto unlock period is suitable for your
-script. If it is too short, there might be occasions when a lock gets
+project. If it is too short, there might be occasions when a lock gets
 auto-removed although the originating script is still running. If it is too
 long, certain functions of your application might be blocked unneccessarily long
 after a crash. 
@@ -82,7 +83,7 @@ the desired number of seconds:
 $locker->timeOutPeriod = 10;
 ```
 
-Don't worry too much about the time-out period. It can make your applications a
+Don't worry too much about the time-out period. It can make your application a
 little bit more user-friendly but is irrelevant, if you run your scripts via cron
 jobs. From a user's point of view it is just less annoying to wait some seconds
-for a reponse than getting an error message.
+for a reponse than to get an error message.
